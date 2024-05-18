@@ -41,7 +41,7 @@ function post_install_kernel_debs__oibaf() {
 	EOF
 
 	# Ubuntu oracular workaround
-	local url_to_check='https://ppa.launchpadcontent.net/oibaf/graphics-drivers/ubuntu/dists/${RELEASE}/Release'
+	local url_to_check="https://ppa.launchpadcontent.net/oibaf/graphics-drivers/ubuntu/dists/${RELEASE}/Release"
 	if curl -o/dev/null -sfIL "$url_to_check" 2>&1; then
 		:
 	else
@@ -53,7 +53,7 @@ function post_install_kernel_debs__oibaf() {
 	do_with_retries 3 chroot_sdcard_apt_get_update
 
 	display_alert "Installing oibaf packages" "${EXTENSION}" "info"
-	do_with_retries 3 chroot_sdcard_apt_get_install glmark2-wayland glmark2-es2 glmark2-es2-wayland mesa-utils
+	do_with_retries 3 chroot_sdcard_apt_get_install --allow-downgrades glmark2-wayland glmark2 glmark2-es2 glmark2-es2-wayland mesa-utils
 
 	display_alert "Upgrading oibaf packages" "${EXTENSION}" "info"
 	do_with_retries 3 chroot_sdcard_apt_get dist-upgrade
