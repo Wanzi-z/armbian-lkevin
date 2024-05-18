@@ -1,21 +1,21 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: John Doe <john.doe@somewhere.on.planet>
-Date: Wed, 17 Apr 2024 21:22:37 +0800
+Date: Sat, 18 May 2024 13:22:18 +0800
 Subject: Patching u-boot rockchip64 files arch/arm/dts/rk3399-tb-ls3399.dts
  configs/tb-ls3399-rk3399_defconfig
 
 Signed-off-by: John Doe <john.doe@somewhere.on.planet>
 ---
- arch/arm/dts/rk3399-tb-ls3399.dts  | 420 ++++++++++
+ arch/arm/dts/rk3399-tb-ls3399.dts  | 408 ++++++++++
  configs/tb-ls3399-rk3399_defconfig | 147 ++++
- 2 files changed, 567 insertions(+)
+ 2 files changed, 555 insertions(+)
 
 diff --git a/arch/arm/dts/rk3399-tb-ls3399.dts b/arch/arm/dts/rk3399-tb-ls3399.dts
 new file mode 100644
-index 00000000000..9b7278bc530
+index 0000000000..1a2a37043a
 --- /dev/null
 +++ b/arch/arm/dts/rk3399-tb-ls3399.dts
-@@ -0,0 +1,420 @@
+@@ -0,0 +1,408 @@
 +/dts-v1/;
 +#include "rk3399.dtsi"
 +#include "rk3399-u-boot.dtsi"
@@ -27,22 +27,15 @@ index 00000000000..9b7278bc530
 +
 +	chosen: chosen {
 +		stdout-path = &uart2;
-+		u-boot,spl-boot-order = &sdmmc, &sdhci;
++		u-boot,spl-boot-order = &sdhci;
 +	};
 +
 +	aliases: aliases {
 +		mmc0 = &sdhci;
-+		mmc1 = &sdmmc;
-+	};
-+
-+	clkin_gmac: clkin-gmac {
-+		compatible = "fixed-clock";
-+		clock-frequency = <125000000>;
-+		clock-output-names = "clkin_gmac";
-+		#clock-cells = <0>;
 +	};
 +
 +	vcc5v0_sys: vcc5v0-sys {
++		u-boot,dm-pre-reloc;
 +		compatible = "regulator-fixed";
 +		regulator-name = "vcc5v0_sys";
 +		gpio = <&gpio4 RK_PD1 GPIO_ACTIVE_HIGH>;
@@ -53,6 +46,7 @@ index 00000000000..9b7278bc530
 +	};
 +
 +	vcc_sys: vcc-sys {
++		u-boot,dm-pre-reloc;
 +		compatible = "regulator-fixed";
 +		regulator-name = "vcc_sys";
 +		regulator-min-microvolt = <3900000>;
@@ -62,6 +56,7 @@ index 00000000000..9b7278bc530
 +	};
 +
 +	vcc3v3_sys: vcc3v3-sys {
++		u-boot,dm-pre-reloc;
 +		compatible = "regulator-fixed";
 +		regulator-name = "vcc3v3_sys";
 +		regulator-min-microvolt = <3300000>;
@@ -70,30 +65,18 @@ index 00000000000..9b7278bc530
 +		regulator-boot-on;
 +	};
 +
-+	vcc_phy: vcc-phy {
++	vcc3v0_sd: vcc3v0-sd {
++		u-boot,dm-pre-reloc;
 +		compatible = "regulator-fixed";
-+		regulator-name = "vcc_phy";
++		regulator-name = "vcc3v0_sd";
++		regulator-max-microvolt = <3000000>;
++		regulator-min-microvolt = <3000000>;
++		gpio = <&gpio0 RK_PA1 GPIO_ACTIVE_HIGH>;
 +		regulator-always-on;
++		enable-active-high;
 +		regulator-boot-on;
-+	};
-+
-+	vdd_log: vdd-log  {
-+		compatible = "pwm-regulator";
-+		regulator-name = "vdd_log";
-+		pwms = <&pwm2 0 25000 1>;
-+		regulator-min-microvolt = <750000>;
-+		regulator-max-microvolt = <1350000>;
-+		rockchip,pwm_voltage = <900000>;
-+		rockchip,pwm_id = <2>;
-+		regulator-always-on;
-+		regulator-boot-on;
-+	};
-+
-+	sdio_pwrseq: sdio-pwrseq {
-+		compatible = "mmc-pwrseq-simple";
-+		clocks = <&rk808 1>;
-+		clock-names = "ext_clock";
-+		reset-gpios = <&gpio0 RK_PB2 GPIO_ACTIVE_LOW>;
++		vin-supply = <&vcc3v3_sys>;
++		status = "okay";
 +	};
 +
 +	adc_keys: adc-keys {
@@ -113,30 +96,15 @@ index 00000000000..9b7278bc530
 +	};
 +};
 +
-+&gmac {
-+	phy-supply = <&vcc_phy>;
-+	phy-mode = "rgmii";
-+	clock_in_out = "input";
-+	snps,reset-gpio = <&gpio3 RK_PB7 GPIO_ACTIVE_LOW>;
-+	snps,reset-active-low;
-+	snps,reset-delays-us = <0 10000 50000>;
-+	assigned-clocks = <&cru SCLK_RMII_SRC>;
-+	assigned-clock-parents = <&clkin_gmac>;
-+	pinctrl-names = "default";
-+	pinctrl-0 = <&rgmii_pins>;
-+	tx_delay = <0x23>;
-+	rx_delay = <0x26>;
-+	status = "okay";
-+};
-+
 +&i2c0 {
-+
++	u-boot,dm-pre-reloc;
 +	i2c-scl-rising-time-ns = <180>;
 +	i2c-scl-falling-time-ns = <30>;
 +	clock-frequency = <400000>;
 +	status = "okay";
 +
 +	vdd_cpu_b: syr837@40 {
++		u-boot,dm-pre-reloc;
 +		compatible = "silergy,syr827";
 +		regulator-compatible = "fan53555-reg";
 +		regulator-name = "vdd_cpu_b";
@@ -151,11 +119,13 @@ index 00000000000..9b7278bc530
 +		reg = <0x40>;
 +
 +		regulator-state-mem {
++			u-boot,dm-pre-reloc;
 +			regulator-off-in-suspend;
 +		};
 +	};
 +
 +	vdd_gpu: syr828@41 {
++		u-boot,dm-pre-reloc;
 +		compatible = "silergy,syr828";
 +		regulator-compatible = "fan53555-reg";
 +		regulator-name = "vdd_gpu";
@@ -171,11 +141,13 @@ index 00000000000..9b7278bc530
 +		status = "okay";
 +
 +		regulator-state-mem {
++			u-boot,dm-pre-reloc;
 +			regulator-off-in-suspend;
 +		};
 +	};
 +
 +	rk808: pmic@1b {
++		u-boot,dm-pre-reloc;
 +		compatible = "rockchip,rk808";
 +		reg = <0x1b>;
 +		interrupt-parent = <&gpio1>;
@@ -199,8 +171,10 @@ index 00000000000..9b7278bc530
 +		status = "okay";
 +
 +		regulators {
++			u-boot,dm-pre-reloc;
 +
 +			vdd_center: DCDC_REG1 {
++				u-boot,dm-pre-reloc;
 +				regulator-always-on;
 +				regulator-boot-on;
 +				regulator-min-microvolt = <750000>;
@@ -209,11 +183,13 @@ index 00000000000..9b7278bc530
 +				regulator-name = "vdd_center";
 +
 +				regulator-state-mem {
++					u-boot,dm-pre-reloc;
 +					regulator-off-in-suspend;
 +				};
 +			};
 +
 +			vdd_cpu_l: DCDC_REG2 {
++				u-boot,dm-pre-reloc;
 +				regulator-always-on;
 +				regulator-boot-on;
 +				regulator-min-microvolt = <750000>;
@@ -222,21 +198,25 @@ index 00000000000..9b7278bc530
 +				regulator-name = "vdd_cpu_l";
 +
 +				regulator-state-mem {
++					u-boot,dm-pre-reloc;
 +					regulator-off-in-suspend;
 +				};
 +			};
 +
 +			vcc_ddr: DCDC_REG3 {
++				u-boot,dm-pre-reloc;
 +				regulator-always-on;
 +				regulator-boot-on;
 +				regulator-name = "vcc_ddr";
 +
 +				regulator-state-mem {
++					u-boot,dm-pre-reloc;
 +					regulator-on-in-suspend;
 +				};
 +			};
 +
 +			vcc_1v8: DCDC_REG4 {
++				u-boot,dm-pre-reloc;
 +				regulator-always-on;
 +				regulator-boot-on;
 +				regulator-min-microvolt = <1800000>;
@@ -244,12 +224,14 @@ index 00000000000..9b7278bc530
 +				regulator-name = "vcc_1v8";
 +
 +				regulator-state-mem {
++					u-boot,dm-pre-reloc;
 +					regulator-on-in-suspend;
 +					regulator-suspend-microvolt = <1800000>;
 +				};
 +			};
 +
 +			vcc1v8_dvp: LDO_REG1 {
++				u-boot,dm-pre-reloc;
 +				regulator-always-on;
 +				regulator-boot-on;
 +				regulator-min-microvolt = <1800000>;
@@ -257,11 +239,13 @@ index 00000000000..9b7278bc530
 +				regulator-name = "vcc1v8_dvp";
 +
 +				regulator-state-mem {
++					u-boot,dm-pre-reloc;
 +					regulator-off-in-suspend;
 +				};
 +			};
 +
 +			gps_vdd33: LDO_REG2 {
++				u-boot,dm-pre-reloc;
 +				regulator-always-on;
 +				regulator-boot-on;
 +				regulator-min-microvolt = <3000000>;
@@ -269,11 +253,13 @@ index 00000000000..9b7278bc530
 +				regulator-name = "gps_vdd33";
 +
 +				regulator-state-mem {
++					u-boot,dm-pre-reloc;
 +					regulator-on-in-suspend;
 +				};
 +			};
 +
 +			vcc1v8_pmull: LDO_REG3 {
++				u-boot,dm-pre-reloc;
 +				regulator-always-on;
 +				regulator-boot-on;
 +				regulator-min-microvolt = <1800000>;
@@ -281,12 +267,14 @@ index 00000000000..9b7278bc530
 +				regulator-name = "vcc1v8_pmull";
 +
 +				regulator-state-mem {
++					u-boot,dm-pre-reloc;
 +					regulator-on-in-suspend;
 +					regulator-suspend-microvolt = <1800000>;
 +				};
 +			};
 +
 +			vcc_sd: LDO_REG4 {
++				u-boot,dm-pre-reloc;
 +				regulator-always-on;
 +				regulator-boot-on;
 +				regulator-min-microvolt = <3000000>;
@@ -294,12 +282,14 @@ index 00000000000..9b7278bc530
 +				regulator-name = "vcc_sd";
 +
 +				regulator-state-mem {
++					u-boot,dm-pre-reloc;
 +					regulator-on-in-suspend;
 +					regulator-suspend-microvolt = <3000000>;
 +				};
 +			};
 +
 +			vcc2v8_dvp: LDO_REG5 {
++				u-boot,dm-pre-reloc;
 +				regulator-always-on;
 +				regulator-boot-on;
 +				regulator-min-microvolt = <3000000>;
@@ -307,11 +297,13 @@ index 00000000000..9b7278bc530
 +				regulator-name = "vcc2v8_dvp";
 +
 +				regulator-state-mem {
++					u-boot,dm-pre-reloc;
 +					regulator-off-in-suspend;
 +				};
 +			};
 +
 +			vcc_1v5: LDO_REG6 {
++				u-boot,dm-pre-reloc;
 +				regulator-always-on;
 +				regulator-boot-on;
 +				regulator-min-microvolt = <1500000>;
@@ -319,12 +311,14 @@ index 00000000000..9b7278bc530
 +				regulator-name = "vcc_1v5";
 +
 +				regulator-state-mem {
++					u-boot,dm-pre-reloc;
 +					regulator-on-in-suspend;
 +					regulator-suspend-microvolt = <1500000>;
 +				};
 +			};
 +
 +			vcca1v8_codec: LDO_REG7 {
++				u-boot,dm-pre-reloc;
 +				regulator-always-on;
 +				regulator-boot-on;
 +				regulator-min-microvolt = <1800000>;
@@ -332,11 +326,13 @@ index 00000000000..9b7278bc530
 +				regulator-name = "vcca1v8_codec";
 +
 +				regulator-state-mem {
++					u-boot,dm-pre-reloc;
 +					regulator-off-in-suspend;
 +				};
 +			};
 +
 +			vcc_3v0: LDO_REG8 {
++				u-boot,dm-pre-reloc;
 +				regulator-always-on;
 +				regulator-boot-on;
 +				regulator-min-microvolt = <3000000>;
@@ -344,27 +340,32 @@ index 00000000000..9b7278bc530
 +				regulator-name = "vcc_3v0";
 +
 +				regulator-state-mem {
++					u-boot,dm-pre-reloc;
 +					regulator-on-in-suspend;
 +					regulator-suspend-microvolt = <3000000>;
 +				};
 +			};
 +
 +			vcc3v3_s3: SWITCH_REG1 {
++				u-boot,dm-pre-reloc;
 +				regulator-always-on;
 +				regulator-boot-on;
 +				regulator-name = "vcc3v3_s3";
 +
 +				regulator-state-mem {
++					u-boot,dm-pre-reloc;
 +					regulator-off-in-suspend;
 +				};
 +			};
 +
 +			vcc3v3_s0: SWITCH_REG2 {
++				u-boot,dm-pre-reloc;
 +				regulator-boot-on;
 +				regulator-always-on;
 +				regulator-name = "vcc3v3_s0";
 +
 +				regulator-state-mem {
++					u-boot,dm-pre-reloc;
 +					regulator-off-in-suspend;
 +				};
 +			};
@@ -372,60 +373,47 @@ index 00000000000..9b7278bc530
 +	};
 +};
 +
-+&sdio0 {
-+	num-slots = <1>;
-+	bus-width = <4>;
-+	cap-sd-highspeed;
-+	cap-sdio-irq;
-+	disable-wp;
-+	supports-sdio;
-+	keep-power-in-suspend;
-+	non-removable;
-+	mmc-pwrseq = <&sdio_pwrseq>;
-+	pinctrl-names = "default";
-+	pinctrl-0 = <&sdio0_bus4 &sdio0_cmd &sdio0_clk>;
-+	status = "okay";
-+};
-+
 +&sdmmc {
-+	num-slots = <1>;
++	u-boot,dm-pre-reloc;
++	broken-cd;
 +	bus-width = <4>;
-+	supports-sd;
 +	cap-mmc-highspeed;
 +	cap-sd-highspeed;
++	sd-uhs-sdr104;
 +	disable-wp;
++	clock-frequency = <150000000>;
++	vmmc-supply = <&vcc3v0_sd>;
++	vqmmc-supply = <&vcc_sd>;
 +	pinctrl-names = "default";
 +	pinctrl-0 = <&sdmmc_clk &sdmmc_cmd &sdmmc_cd &sdmmc_bus4>;
-+	vqmmc-supply = <&vcc_sd>;
 +	status = "okay";
 +};
 +
 +&sdhci {
++	u-boot,dm-pre-reloc;
 +	bus-width = <8>;
-+	mmc-hs200-1_8v;
 +	supports-emmc;
 +	non-removable;
++	mmc-hs200-1_8v;
++	mmc-hs400-1_8v;
 +	keep-power-in-suspend;
++	mmc-hs400-enhanced-strobe;
 +	status = "okay";
 +};
 +
 +&emmc_phy {
++	u-boot,dm-pre-reloc;
 +	status = "okay";
 +};
 +
 +&saradc {
++	u-boot,dm-pre-reloc;
 +	vref-supply = <&vcc_1v8>;
 +	status = "okay";
 +};
 +
-+&tsadc {
-+	rockchip,hw-tshut-mode = <1>;
-+	rockchip,hw-tshut-polarity = <1>;
-+	rockchip,hw-tshut-temp = <120000>;
-+	status = "okay";
-+};
-+
 +&pwm2 {
++	u-boot,dm-pre-reloc;
 +	status = "okay";
 +};
 +
@@ -439,7 +427,7 @@ index 00000000000..9b7278bc530
 \ No newline at end of file
 diff --git a/configs/tb-ls3399-rk3399_defconfig b/configs/tb-ls3399-rk3399_defconfig
 new file mode 100644
-index 00000000000..f0cf1027d34
+index 0000000000..f0cf1027d3
 --- /dev/null
 +++ b/configs/tb-ls3399-rk3399_defconfig
 @@ -0,0 +1,147 @@
