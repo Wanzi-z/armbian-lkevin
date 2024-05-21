@@ -17,8 +17,6 @@
 	aliases: aliases {
 		mmc0 = &sdhci;
 		mmc1 = &sdmmc0;
-        ethernet0 = &r8125_1;
-		ethernet1 = &r8125_2;
 	};
 
 	fiq_debugger: fiq-debugger {
@@ -105,32 +103,50 @@
 		};
 	};
 
+	hdmi_sound: hdmi-sound {
+		compatible = "simple-audio-card";
+		simple-audio-card,format = "i2s";
+		simple-audio-card,mclk-fs = <128>;
+		simple-audio-card,name = "rockchip,hdmi";
+		status = "disabled";
+
+		simple-audio-card,cpu {
+				sound-dai = <&i2s0_8ch>;
+		};
+		simple-audio-card,codec {
+				sound-dai = <&hdmi>;
+		};
+	};
+
 	gpio_leds: gpio-leds {
 		compatible = "gpio-leds";
 		
 		led_sys: led-sys {
-			color = <LED_COLOR_ID_RED>;
-			function = LED_FUNCTION_POWER;
-			linux,default-trigger = "heartbeat";
 			gpios = <&gpio3 RK_PA2 GPIO_ACTIVE_HIGH>;
+            linux,default-trigger = "heartbeat";
+			default-state = "on";
+			label = "red:sys";
 		};
 
 		led_wan: led-wan {
-			color = <LED_COLOR_ID_GREEN>;
-			function = LED_FUNCTION_WAN;
 			gpios = <&gpio3 RK_PA4 GPIO_ACTIVE_HIGH>;
+			linux,default-trigger = "activity";
+			default-state = "on";
+			label = "green:wan";
 		};
 
 		led_lan: led-lan {
-			color = <LED_COLOR_ID_GREEN>;
-			function = LED_FUNCTION_LAN;
 			gpios = <&gpio3 RK_PA3 GPIO_ACTIVE_HIGH>;
+			linux,default-trigger = "activity";
+			default-state = "on";
+			label = "green:lan";
 		};
 
 		led_wifi: led-wifi {
-			color = <LED_COLOR_ID_GREEN>;
-			function = LED_FUNCTION_WLAN;
 			gpios = <&gpio3 RK_PA5 GPIO_ACTIVE_HIGH>;
+			linux,default-trigger = "activity";
+			default-state = "on";
+			label = "green:wifi";
 		};
 	};
 };
@@ -174,7 +190,6 @@
 };
 
 &hdmi {
-	status = "okay";
 	rockchip,phy-table =
 		<92812500  0x8009 0x0000 0x0270>,
 		<165000000 0x800b 0x0000 0x026d>,
@@ -182,6 +197,7 @@
 		<297000000 0x800b 0x0000 0x01ad>,
 		<594000000 0x8029 0x0000 0x0088>,
 		<000000000 0x0000 0x0000 0x0000>;
+	status = "okay";
 };
 
 &hdmi_in_vp0 {
@@ -270,7 +286,7 @@
 				regulator-ramp-delay = <6001>;
 				regulator-initial-mode = <0x2>;
 				regulator-name = "vdd_gpu";
-                
+    
 				regulator-state-mem {
 					regulator-off-in-suspend;
 				};
@@ -407,7 +423,7 @@
 				regulator-min-microvolt = <1800000>;
 				regulator-max-microvolt = <1800000>;
 				regulator-name = "vcca1v8_image";
-                
+    
 				regulator-state-mem {
 					regulator-off-in-suspend;
 				};
