@@ -1,21 +1,21 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: John Doe <john.doe@somewhere.on.planet>
-Date: Sat, 18 May 2024 13:22:18 +0800
+Date: Fri, 24 May 2024 21:09:08 +0800
 Subject: Patching u-boot rockchip64 files arch/arm/dts/rk3399-tb-ls3399.dts
  configs/tb-ls3399-rk3399_defconfig
 
 Signed-off-by: John Doe <john.doe@somewhere.on.planet>
 ---
- arch/arm/dts/rk3399-tb-ls3399.dts  | 408 ++++++++++
+ arch/arm/dts/rk3399-tb-ls3399.dts  | 409 ++++++++++
  configs/tb-ls3399-rk3399_defconfig | 147 ++++
- 2 files changed, 555 insertions(+)
+ 2 files changed, 556 insertions(+)
 
 diff --git a/arch/arm/dts/rk3399-tb-ls3399.dts b/arch/arm/dts/rk3399-tb-ls3399.dts
 new file mode 100644
-index 0000000000..1a2a37043a
+index 0000000000..062df86b21
 --- /dev/null
 +++ b/arch/arm/dts/rk3399-tb-ls3399.dts
-@@ -0,0 +1,408 @@
+@@ -0,0 +1,409 @@
 +/dts-v1/;
 +#include "rk3399.dtsi"
 +#include "rk3399-u-boot.dtsi"
@@ -27,11 +27,12 @@ index 0000000000..1a2a37043a
 +
 +	chosen: chosen {
 +		stdout-path = &uart2;
-+		u-boot,spl-boot-order = &sdhci;
++		u-boot,spl-boot-order = &sdmmc, &sdhci;
 +	};
 +
 +	aliases: aliases {
 +		mmc0 = &sdhci;
++		mmc1 = &sdmmc;
 +	};
 +
 +	vcc5v0_sys: vcc5v0-sys {

@@ -1,6 +1,6 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: John Doe <john.doe@somewhere.on.planet>
-Date: Sun, 19 May 2024 21:26:32 +0800
+Date: Thu, 23 May 2024 21:58:33 +0800
 Subject: Patching u-boot rk35xx files arch/arm/dts/rk3568-nanopi-r5c.dts
  configs/nanopi-r5c-rk3568_defconfig
 
@@ -12,7 +12,7 @@ Signed-off-by: John Doe <john.doe@somewhere.on.planet>
 
 diff --git a/arch/arm/dts/rk3568-nanopi-r5c.dts b/arch/arm/dts/rk3568-nanopi-r5c.dts
 new file mode 100644
-index 0000000000..30dde6b8bb
+index 0000000000..098cee2776
 --- /dev/null
 +++ b/arch/arm/dts/rk3568-nanopi-r5c.dts
 @@ -0,0 +1,393 @@
@@ -27,7 +27,7 @@ index 0000000000..30dde6b8bb
 +
 +	chosen: chosen {
 +		stdout-path = &uart2;
-+		u-boot,spl-boot-order = &sdhci;
++		u-boot,spl-boot-order = &sdmmc0, &sdhci;
 +	};
 +
 +	aliases: aliases {

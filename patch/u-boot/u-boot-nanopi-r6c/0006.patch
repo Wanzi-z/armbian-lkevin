@@ -1,0 +1,209 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: John Doe <john.doe@somewhere.on.planet>
+Date: Wed, 29 May 2024 20:51:19 +0800
+Subject: Patching u-boot rk35xx files arch/arm/dts/rk3588s-nanopi-r6c.dts
+
+Signed-off-by: John Doe <john.doe@somewhere.on.planet>
+---
+ arch/arm/dts/rk3588s-nanopi-r6c.dts | 176 ----------
+ 1 file changed, 176 deletions(-)
+
+diff --git a/arch/arm/dts/rk3588s-nanopi-r6c.dts b/arch/arm/dts/rk3588s-nanopi-r6c.dts
+index ef61785481..3dccdbc6d7 100644
+--- a/arch/arm/dts/rk3588s-nanopi-r6c.dts
++++ b/arch/arm/dts/rk3588s-nanopi-r6c.dts
+@@ -5,191 +5,15 @@
+ 
+ / {
+ 	model = "RK3588S NanoPi R6C";
+ 	compatible = "rockchip,rk3588s-nanopi-r6c", "rockchip,rk3588s";
+ 
+-	chosen: chosen {
+-		stdout-path = &uart2;
+-		u-boot,spl-boot-order = &sdmmc, &sdhci;
+-	};
+-
+-	aliases: aliases {
+-		mmc0 = &sdhci;
+-		mmc1 = &sdmmc;
+-	};
+-
+ 	vcc5v0_sys: vcc5v0-sys {
+ 		u-boot,dm-pre-reloc;
+ 		compatible = "regulator-fixed";
+ 		regulator-name = "vcc5v0_sys";
+-		regulator-always-on;
+-		regulator-boot-on;
+-		regulator-min-microvolt = <5000000>;
+-		regulator-max-microvolt = <5000000>;
+-	};
+-
+-	vcc5v0_usb: vcc5v0-usb {
+-		u-boot,dm-pre-reloc;
+-		compatible = "regulator-fixed";
+-		regulator-name = "vcc5v0_usb";
+-		regulator-always-on;
+-		regulator-boot-on;
+ 		regulator-min-microvolt = <5000000>;
+ 		regulator-max-microvolt = <5000000>;
+-		vin-supply = <&vcc5v0_sys>;
+-	};
+-
+-	vcc_1v1_nldo_s3: vcc-1v1-nldo-s3 {
+-		u-boot,dm-pre-reloc;
+-		compatible = "regulator-fixed";
+-		regulator-name = "vcc_1v1_nldo_s3";
+-		regulator-always-on;
+-		regulator-boot-on;
+-		regulator-min-microvolt = <1100000>;
+-		regulator-max-microvolt = <1100000>;
+-		vin-supply = <&vcc5v0_sys>;
+-	};
+-
+-	vcc_3v3_sd_s0: vcc-3v3-sd-s0 {
+-		u-boot,dm-pre-reloc;
+-		compatible = "regulator-fixed";
+-		regulator-name = "vcc_3v3_sd_s0";
+-		enable-active-high;
+-		gpio = <&gpio4 RK_PB4 GPIO_ACTIVE_HIGH>;
+-		regulator-max-microvolt = <3000000>;
+-		regulator-min-microvolt = <3000000>;
+ 		regulator-always-on;
+ 		regulator-boot-on;
+ 	};
+-
+-	vcc_3v3_pcie20: vcc3v3-pcie20 {
+-		u-boot,dm-pre-reloc;
+-		compatible = "regulator-fixed";
+-		regulator-name = "vcc_3v3_pcie20";
+-		regulator-min-microvolt = <3300000>;
+-		regulator-max-microvolt = <3300000>;
+-		regulator-always-on;
+-		regulator-boot-on;
+-	};
+-};
+-
+-&i2c0 {
+-	u-boot,dm-pre-reloc;
+-	status = "okay";
+-
+-	vdd_cpu_big0_s0: vdd_cpu_big0_mem_s0: rk8602@42 {
+-		u-boot,dm-pre-reloc;
+-		compatible = "rockchip,rk8602";
+-		reg = <0x42>;
+-		vin-supply = <&vcc5v0_sys>;
+-		regulator-compatible = "rk860x-reg";
+-		regulator-name = "vdd_cpu_big0_s0";
+-		regulator-min-microvolt = <550000>;
+-		regulator-max-microvolt = <1050000>;
+-		regulator-ramp-delay = <2300>;
+-		rockchip,suspend-voltage-selector = <1>;
+-		regulator-boot-on;
+-		regulator-always-on;
+-		
+-		regulator-state-mem {
+-			u-boot,dm-pre-reloc;
+-			regulator-off-in-suspend;
+-		};
+-	};
+-
+-	vdd_cpu_big1_s0: vdd_cpu_big1_mem_s0: rk8603@43 {
+-		u-boot,dm-pre-reloc;
+-		compatible = "rockchip,rk8603";
+-		reg = <0x43>;
+-		vin-supply = <&vcc5v0_sys>;
+-		regulator-compatible = "rk860x-reg";
+-		regulator-name = "vdd_cpu_big1_s0";
+-		regulator-min-microvolt = <550000>;
+-		regulator-max-microvolt = <1050000>;
+-		regulator-ramp-delay = <2300>;
+-		rockchip,suspend-voltage-selector = <1>;
+-		regulator-boot-on;
+-		regulator-always-on;
+-
+-		regulator-state-mem {
+-			u-boot,dm-pre-reloc;
+-			regulator-off-in-suspend;
+-		};
+-	};
+-};
+-
+-&i2c2 {
+-	u-boot,dm-pre-reloc;
+-	status = "okay";
+-
+-	vdd_npu_s0: vdd_npu_mem_s0: rk8602@42 {
+-		u-boot,dm-pre-reloc;
+-		compatible = "rockchip,rk8602";
+-		reg = <0x42>;
+-		vin-supply = <&vcc5v0_sys>;
+-		regulator-compatible = "rk860x-reg";
+-		regulator-name = "vdd_npu_s0";
+-		regulator-min-microvolt = <550000>;
+-		regulator-max-microvolt = <950000>;
+-		regulator-ramp-delay = <2300>;
+-		rockchip,suspend-voltage-selector = <1>;
+-		regulator-boot-on;
+-		regulator-always-on;
+-
+-		regulator-state-mem {
+-			u-boot,dm-pre-reloc;
+-			regulator-off-in-suspend;
+-		};
+-	};
+-};
+-
+-&sdhci {
+-	u-boot,dm-pre-reloc;
+-	bus-width = <8>;
+-	no-sdio;
+-	no-sd;
+-	non-removable;
+-	max-frequency = <200000000>;
+-	mmc-hs400-1_8v;
+-	mmc-hs400-enhanced-strobe;
+-	full-pwr-cycle-in-suspend;
+-	status = "okay";
+-};
+-
+-&sdmmc {
+-	u-boot,dm-pre-reloc;
+-	max-frequency = <150000000>;
+-	no-sdio;
+-	no-mmc;
+-	bus-width = <4>;
+-	cap-mmc-highspeed;
+-	cap-sd-highspeed;
+-	disable-wp;
+-	sd-uhs-sdr104;
+-	vmmc-supply = <&vcc_3v3_sd_s0>;
+-	pinctrl-names = "default";
+-	pinctrl-0 = <&sdmmc_bus4 &sdmmc_clk &sdmmc_cmd &sdmmc_det>;
+-	status = "okay";
+-};
+-
+-&pcie2x1l1 {
+-	u-boot,dm-pre-reloc;
+-	reset-gpios = <&gpio1 RK_PA7 GPIO_ACTIVE_HIGH>;
+-	rockchip,init-delay-ms = <100>;
+-	vpcie3v3-supply = <&vcc_3v3_pcie20>;
+-	status = "okay";
+-};
+-
+-&pcie2x1l2 {
+-	u-boot,dm-pre-reloc;
+-	reset-gpios = <&gpio3 RK_PD1 GPIO_ACTIVE_HIGH>;
+-	vpcie3v3-supply = <&vcc_3v3_pcie20>;
+-	status = "okay";
+-};
+-
+-&crypto {
+-	status = "okay";
+-};
+-
+-&uart2 {
+-	status = "okay";
+ };
+-- 
+Created with Armbian build tools https://github.com/armbian/build
+

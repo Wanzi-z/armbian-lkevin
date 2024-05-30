@@ -650,15 +650,7 @@
 	status = "okay";
 };
 
-&vdec_mmu {
-	status = "okay";
-};
-
-&vpu_mmu {
-	status = "okay";
-};
-
-&vopb {
+&vopb {	
 	status = "okay";
 };
 
@@ -667,7 +659,7 @@
 };
 
 &vopl {
-	status = "disable";
+	status = "okay";
 };
 
 &vopl_mmu {

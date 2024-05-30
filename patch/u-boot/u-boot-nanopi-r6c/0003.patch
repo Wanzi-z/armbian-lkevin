@@ -1,0 +1,30 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: John Doe <john.doe@somewhere.on.planet>
+Date: Wed, 29 May 2024 11:56:39 +0800
+Subject: Patching u-boot rk35xx files arch/arm/dts/rk3588s-nanopi-r6c.dts
+
+Signed-off-by: John Doe <john.doe@somewhere.on.planet>
+---
+ arch/arm/dts/rk3588s-nanopi-r6c.dts | 6 +-----
+ 1 file changed, 1 insertion(+), 5 deletions(-)
+
+diff --git a/arch/arm/dts/rk3588s-nanopi-r6c.dts b/arch/arm/dts/rk3588s-nanopi-r6c.dts
+index 93e3c42702..d603e21b29 100644
+--- a/arch/arm/dts/rk3588s-nanopi-r6c.dts
++++ b/arch/arm/dts/rk3588s-nanopi-r6c.dts
+@@ -185,10 +185,6 @@
+ 	status = "okay";
+ };
+ 
+ &uart2 {
+ 	status = "okay";
+-};
+-
+-&uart5 {
+-	status = "okay";
+-};
++};
+\ No newline at end of file
+-- 
+Created with Armbian build tools https://github.com/armbian/build
+

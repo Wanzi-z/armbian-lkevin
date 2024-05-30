@@ -1,8 +1,11 @@
 /dts-v1/;
 #include <dt-bindings/gpio/gpio.h>
-#include <dt-bindings/leds/common.h>
-#include <dt-bindings/input/rk-input.h>
+#include <dt-bindings/pwm/pwm.h>
+#include <dt-bindings/pinctrl/rockchip.h>
+#include <dt-bindings/input/linux-event-codes.h>
+#include <dt-bindings/display/drm_mipi_dsi.h>
 #include <dt-bindings/display/rockchip_vop.h>
+#include <dt-bindings/sensor-dev.h>
 #include "rk3568.dtsi"
 
 / {
@@ -11,12 +14,14 @@
 
 	chosen: chosen {
 		stdout-path = &uart2;
-		u-boot,spl-boot-order = &sdhci;
+		u-boot,spl-boot-order = &sdmmc0, &sdhci;
 	};
 
 	aliases: aliases {
 		mmc0 = &sdhci;
 		mmc1 = &sdmmc0;
+		ethernet0 = &r8125_1;
+		ethernet1 = &r8125_2;
 	};
 
 	fiq_debugger: fiq-debugger {
@@ -92,29 +97,29 @@
 		vin-supply = <&vdd_usbc>;
 	};
 
-	gpio_keys: gpio-keys {
-		compatible = "gpio-keys";
-
-		button-reset {
-			label = "reset";
-			gpios = <&gpio0 RK_PB7 GPIO_ACTIVE_LOW>;
-			linux,code = <KEY_RESTART>;
-			debounce-interval = <50>;
-		};
-	};
-
 	hdmi_sound: hdmi-sound {
 		compatible = "simple-audio-card";
 		simple-audio-card,format = "i2s";
 		simple-audio-card,mclk-fs = <128>;
 		simple-audio-card,name = "rockchip,hdmi";
-		status = "disabled";
+		status = "okay";
 
 		simple-audio-card,cpu {
 				sound-dai = <&i2s0_8ch>;
 		};
 		simple-audio-card,codec {
 				sound-dai = <&hdmi>;
+		};
+	};
+
+	gpio_keys: gpio-keys {
+		compatible = "gpio-keys";
+
+		button_restart: button-restart {
+			label = "restart";
+			gpios = <&gpio0 RK_PB7 GPIO_ACTIVE_LOW>;
+			linux,code = <KEY_RESTART>;
+			debounce-interval = <50>;
 		};
 	};
 
@@ -151,12 +156,6 @@
 	};
 };
 
-&bus_npu {
-	bus-supply = <&vdd_logic>;
-	pvtm-supply = <&vdd_cpu>;
-	status = "okay";
-};
-
 &cpu0 {
 	cpu-supply = <&vdd_cpu>;
 };
@@ -171,6 +170,12 @@
 
 &cpu3 {
 	cpu-supply = <&vdd_cpu>;
+};
+
+&bus_npu {
+	bus-supply = <&vdd_logic>;
+	pvtm-supply = <&vdd_cpu>;
+	status = "okay";
 };
 
 &dfi {
@@ -190,13 +195,6 @@
 };
 
 &hdmi {
-	rockchip,phy-table =
-		<92812500  0x8009 0x0000 0x0270>,
-		<165000000 0x800b 0x0000 0x026d>,
-		<185625000 0x800b 0x0000 0x01ed>,
-		<297000000 0x800b 0x0000 0x01ad>,
-		<594000000 0x8029 0x0000 0x0088>,
-		<000000000 0x0000 0x0000 0x0000>;
 	status = "okay";
 };
 
@@ -674,10 +672,10 @@
 };
 
 &vop {
-	status = "okay";
 	assigned-clocks = <&cru DCLK_VOP0>, <&cru DCLK_VOP1>;
 	assigned-clock-parents = <&pmucru PLL_HPLL>, <&cru PLL_VPLL>;
 	support-multi-area;
+	status = "okay";
 };
 
 &vop_mmu {
@@ -690,11 +688,6 @@
 				1 << ROCKCHIP_VOP2_CLUSTER1 | 1 << ROCKCHIP_VOP2_ESMART1 )>;
 	rockchip,primary-plane = <ROCKCHIP_VOP2_ESMART0>;
 	cursor-win-id = <ROCKCHIP_VOP2_ESMART1>;
-};
-
-&vp1 {
-	rockchip,plane-mask = <(1 << ROCKCHIP_VOP2_SMART0 | 1 << ROCKCHIP_VOP2_SMART1)>;
-	rockchip,primary-plane = <ROCKCHIP_VOP2_SMART0>;
 };
 
 &u2phy0_host {
