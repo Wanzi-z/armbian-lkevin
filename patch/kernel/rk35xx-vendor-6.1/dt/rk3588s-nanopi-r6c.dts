@@ -1,5 +1,4 @@
 /dts-v1/;
-
 #include <dt-bindings/gpio/gpio.h>
 #include <dt-bindings/pwm/pwm.h>
 #include <dt-bindings/pinctrl/rockchip.h>
@@ -10,70 +9,50 @@
 #include <dt-bindings/usb/pd.h>
 #include "rk3588s.dtsi"
 #include "rk3588-rk806-single.dtsi"
-#include "rk3588-linux.dtsi"
 
 / {
 	model = "RK3588S NanoPi R6C";
-	compatible = "rockchip,rk3588s-nanopi-r6c", "rockchip,rk3588s";
+	compatible = "rockchip,rk3588s-nanopi-r6c", "rockchip,rk3588";
 
-	/delete-node/ chosen;
+	aliases: aliases {
+		mmc0 = &sdhci;
+		mmc1 = &sdmmc;
+		ethernet0 = &r8125_u25;
+		ethernet1 = &gmac1;
+	};
 
-	// aliases: aliases {
-	// 	mmc0 = &sdhci;
-	// 	mmc1 = &sdmmc;
-	// 	ethernet0 = &gmac1;
-	// 	ethernet1 = &r8125_u25;
-	// };
+	chosen: chosen {
+		stdout-path = &uart2;
+		u-boot,spl-boot-order = &sdmmc, &sdhci;
+	};
+
+	fiq_debugger: fiq-debugger {
+		compatible = "rockchip,fiq-debugger";
+		rockchip,serial-id = <2>;
+		rockchip,wake-irq = <0>;
+		rockchip,irq-mode-enable = <1>;
+		rockchip,baudrate = <1500000>;
+		interrupts = <GIC_SPI 423 IRQ_TYPE_LEVEL_LOW>;
+		status = "okay";
+	};
 
 	vcc5v0_sys: vcc5v0-sys {
 		compatible = "regulator-fixed";
 		regulator-name = "vcc5v0_sys";
-		regulator-always-on;
-		regulator-boot-on;
 		regulator-min-microvolt = <5000000>;
 		regulator-max-microvolt = <5000000>;
+		regulator-always-on;
+		regulator-boot-on;
 	};
 
 	vcc5v0_usb: vcc5v0-usb {
 		compatible = "regulator-fixed";
 		regulator-name = "vcc5v0_usb";
-		regulator-always-on;
-		regulator-boot-on;
 		regulator-min-microvolt = <5000000>;
 		regulator-max-microvolt = <5000000>;
+		regulator-always-on;
+		regulator-boot-on;
 		vin-supply = <&vcc5v0_sys>;
-	};
-
-	vcc_1v1_nldo_s3: vcc-1v1-nldo-s3 {
-		compatible = "regulator-fixed";
-		regulator-name = "vcc_1v1_nldo_s3";
-		regulator-always-on;
-		regulator-boot-on;
-		regulator-min-microvolt = <1100000>;
-		regulator-max-microvolt = <1100000>;
-		vin-supply = <&vcc5v0_sys>;
-	};
-
-	vcc_3v3_sd_s0: vcc-3v3-sd-s0 {
-		compatible = "regulator-fixed";
-		regulator-name = "vcc_3v3_sd_s0";
-		enable-active-high;
-		gpio = <&gpio4 RK_PB4 GPIO_ACTIVE_HIGH>;
-		regulator-max-microvolt = <3000000>;
-		regulator-min-microvolt = <3000000>;
-		regulator-always-on;
-		regulator-boot-on;
-		vin-supply = <&vcc_3v3_s3>;
-	};
-
-	vcc_3v3_pcie20: vcc3v3-pcie20 {
-		compatible = "regulator-fixed";
-		regulator-name = "vcc_3v3_pcie20";
-		regulator-min-microvolt = <3300000>;
-		regulator-max-microvolt = <3300000>;
-		regulator-always-on;
-		regulator-boot-on;
-		vin-supply = <&vcc_3v3_s3>;
 	};
 
 	vbus5v0_typec: vbus5v0-typec {
@@ -96,13 +75,36 @@
 		vin-supply = <&vcc5v0_usb>;
 	};
 
-	hdmi0_sound: hdmi0-sound {
-		status = "okay";
-		compatible = "rockchip,hdmi";
-		rockchip,mclk-fs = <128>;
-		rockchip,card-name = "rockchip,hdmi0";
-		rockchip,cpu = <&i2s5_8ch>;
-		rockchip,codec = <&hdmi0>;
+	vcc_3v3_sd_s0: vcc-3v3-sd-s0-regulator {
+		compatible = "regulator-fixed";
+		regulator-name = "vcc_3v3_sd_s0";
+		gpio = <&gpio4 RK_PB4 GPIO_ACTIVE_HIGH>;
+		regulator-max-microvolt = <3000000>;
+		regulator-min-microvolt = <3000000>;
+		regulator-always-on;
+		enable-active-high;
+		regulator-boot-on;
+		vin-supply = <&vcc_3v3_s3>;
+	};
+
+	vcc_3v3_pcie20: vcc3v3-pcie20 {
+		compatible = "regulator-fixed";
+		regulator-name = "vcc_3v3_pcie20";
+		regulator-min-microvolt = <3300000>;
+		regulator-max-microvolt = <3300000>;
+		regulator-always-on;
+		regulator-boot-on;
+		vin-supply = <&vcc_3v3_s3>;
+	};
+
+	vcc_1v1_nldo_s3: vcc-1v1-nldo-s3 {
+		compatible = "regulator-fixed";
+		regulator-name = "vcc_1v1_nldo_s3";
+		regulator-min-microvolt = <1100000>;
+		regulator-max-microvolt = <1100000>;
+		regulator-always-on;
+		regulator-boot-on;
+		vin-supply = <&vcc5v0_sys>;
 	};
 
 	gpio_keys: gpio-keys {
@@ -118,10 +120,10 @@
 
 	gpio_leds: gpio-leds {
 		compatible = "gpio-leds";
-
+		
 		led_sys: led-sys {
 			gpios = <&gpio1 RK_PC1 GPIO_ACTIVE_HIGH>;
-			linux,default-trigger = "heartbeat";
+            linux,default-trigger = "heartbeat";
 			default-state = "on";
 			label = "red:sys";
 		};
@@ -140,12 +142,23 @@
 			label = "green:lan";
 		};
 
-		led_user: led-user {
+		user_led: user-led {
 			gpios = <&gpio1 RK_PC4 GPIO_ACTIVE_HIGH>;
 			linux,default-trigger = "activity";
 			default-state = "on";
 			label = "green:user";
 		};
+	};	
+
+	hdmi0_sound: hdmi0-sound {
+		compatible = "rockchip,hdmi";
+		rockchip,mclk-fs = <128>;
+		rockchip,card-name = "rockchip-hdmi0";
+		status = "okay";
+	};
+
+	test-power {
+		status = "okay";
 	};
 };
 
@@ -167,10 +180,10 @@
 
 	pinctrl-names = "default";
 	pinctrl-0 = <&gmac1_miim
-			&gmac1_tx_bus2
-			&gmac1_rx_bus2
-			&gmac1_rgmii_clk
-			&gmac1_rgmii_bus>;
+		     &gmac1_tx_bus2
+		     &gmac1_rx_bus2
+		     &gmac1_rgmii_clk
+		     &gmac1_rgmii_bus>;
 
 	tx_delay = <0x42>;
 
@@ -201,17 +214,23 @@
 	status = "okay";
 };
 
+&dfi {
+	status = "okay";
+};
+
+&dmc {
+	status = "okay";
+	center-supply = <&vdd_ddr_s0>;
+	mem-supply = <&vdd_log_s0>;
+};
+
 &hdmi0 {
-	cec-enable;
 	enable-gpios = <&gpio4 RK_PB6 GPIO_ACTIVE_HIGH>;
+	cec-enable = "true";
 	status = "okay";
 };
 
 &hdmi0_in_vp0 {
-	status = "okay";
-};
-
-&hdmi0_sound {
 	status = "okay";
 };
 
@@ -224,7 +243,14 @@
 	status = "okay";
 };
 
+&display_subsystem {
+	clocks = <&hdptxphy_hdmi_clk0>;
+	clock-names = "hdmi0_phy_pll";
+};
+
 &i2c0 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&i2c0m2_xfer>;
 	status = "okay";
 
 	vdd_cpu_big0_s0: vdd_cpu_big0_mem_s0: rk8602@42 {
@@ -237,9 +263,9 @@
 		regulator-max-microvolt = <1050000>;
 		regulator-ramp-delay = <2300>;
 		rockchip,suspend-voltage-selector = <1>;
-		regulator-boot-on;
 		regulator-always-on;
-		
+		regulator-boot-on;
+
 		regulator-state-mem {
 			regulator-off-in-suspend;
 		};
@@ -255,8 +281,8 @@
 		regulator-max-microvolt = <1050000>;
 		regulator-ramp-delay = <2300>;
 		rockchip,suspend-voltage-selector = <1>;
-		regulator-boot-on;
 		regulator-always-on;
+		regulator-boot-on;
 
 		regulator-state-mem {
 			regulator-off-in-suspend;
@@ -277,8 +303,8 @@
 		regulator-max-microvolt = <950000>;
 		regulator-ramp-delay = <2300>;
 		rockchip,suspend-voltage-selector = <1>;
-		regulator-boot-on;
 		regulator-always-on;
+		regulator-boot-on;
 
 		regulator-state-mem {
 			regulator-off-in-suspend;
@@ -367,16 +393,24 @@
 };
 
 &saradc {
-	status = "okay";
 	vref-supply = <&avcc_1v8_s0>;
+	status = "okay";
 };
 
 &tsadc {
 	status = "okay";
 };
 
-&uart2 {
+&rng {
 	status = "okay";
+};
+
+&crypto {
+	status = "okay";
+};
+
+&uart2 {
+	status = "disabled";
 };
 
 &iep {
@@ -443,10 +477,6 @@
 	status = "okay";
 };
 
-&avsd {
-	status = "okay";
-};
-
 &rga3_core0 {
 	status = "okay";
 };
@@ -475,16 +505,6 @@
 
 &rknpu_mmu {
 	status = "okay";
-};
-
-&dfi {
-	status = "okay";
-};
-
-&dmc {
-	status = "okay";
-	center-supply = <&vdd_ddr_s0>;
-	mem-supply = <&vdd_log_s0>;
 };
 
 &rkvdec_ccu {
@@ -556,8 +576,8 @@
 &vop {
 	assigned-clocks = <&cru ACLK_VOP>;
 	assigned-clock-rates = <800000000>;
-	support-multi-area;
 	status = "okay";
+	disable-win-move;
 };
 
 &vop_mmu {
@@ -565,13 +585,27 @@
 };
 
 &vp0 {
+	cursor-win-id=<ROCKCHIP_VOP2_ESMART0>;
 	rockchip,plane-mask = <(1 << ROCKCHIP_VOP2_CLUSTER0 | 1 << ROCKCHIP_VOP2_ESMART0)>;
-	rockchip,primary-plane = <ROCKCHIP_VOP2_ESMART0>;
+	rockchip,primary-plane = <ROCKCHIP_VOP2_CLUSTER0>;
 };
 
 &vp1 {
+	cursor-win-id=<ROCKCHIP_VOP2_ESMART1>;
 	rockchip,plane-mask = <(1 << ROCKCHIP_VOP2_CLUSTER1 | 1 << ROCKCHIP_VOP2_ESMART1)>;
-	rockchip,primary-plane = <ROCKCHIP_VOP2_ESMART1>;
+	rockchip,primary-plane = <ROCKCHIP_VOP2_CLUSTER1>;
+};
+
+&vp2 {
+	cursor-win-id=<ROCKCHIP_VOP2_ESMART2>;
+	rockchip,plane-mask = <(1 << ROCKCHIP_VOP2_CLUSTER2 | 1 << ROCKCHIP_VOP2_ESMART2)>;
+	rockchip,primary-plane = <ROCKCHIP_VOP2_CLUSTER2>;
+};
+
+&vp3 {
+	cursor-win-id=<ROCKCHIP_VOP2_ESMART3>;
+	rockchip,plane-mask = <(1 << ROCKCHIP_VOP2_CLUSTER3 | 1 << ROCKCHIP_VOP2_ESMART3)>;
+	rockchip,primary-plane = <ROCKCHIP_VOP2_CLUSTER3>;
 };
 
 &u2phy0 {
@@ -613,8 +647,7 @@
 };
 
 &usbdrd_dwc3_0 {
-	dr_mode = "otg";
+	dr_mode = "host";
 	extcon = <&u2phy0>;
-	snps,xhci-trb-ent-quirk;
 	status = "okay";
 };

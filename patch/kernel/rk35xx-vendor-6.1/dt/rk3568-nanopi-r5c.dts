@@ -749,5 +749,3 @@
 &usbhost30 {
 	status = "okay";
 };
-
-

@@ -15,8 +15,6 @@ WIREGUARD="no"
 DDR_BLOB="rk35/rk3588_ddr_lp4_2112MHz_lp5_2736MHz_v1.15.bin"
 BL31_BLOB="rk35/rk3588_bl31_v1.45.elf"
 
-BOOTSCRIPT="boot-rk3588-legacy.cmd:boot.cmd"
-
 function post_family_config__nanopi-r6c_use_orangepi_uboot() {
         BOOTSOURCE='https://github.com/liwei19920307/u-boot-orangepi.git'
         BOOTBRANCH='branch:v2017.09-rk3588'

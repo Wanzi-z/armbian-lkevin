@@ -1,29 +1,28 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: John Doe <john.doe@somewhere.on.planet>
-Date: Wed, 29 May 2024 10:33:27 +0800
+Date: Sat, 1 Jun 2024 17:05:48 +0800
 Subject: Patching u-boot rk35xx files arch/arm/dts/rk3588s-nanopi-r6c.dts
  configs/nanopi-r6c-rk3588s_defconfig
 
 Signed-off-by: John Doe <john.doe@somewhere.on.planet>
 ---
- arch/arm/dts/rk3588s-nanopi-r6c.dts  | 200 ++++++++
- configs/nanopi-r6c-rk3588s_defconfig | 256 ++++++++++
- 2 files changed, 456 insertions(+)
+ arch/arm/dts/rk3588s-nanopi-r6c.dts  |  36 ++
+ configs/nanopi-r6c-rk3588s_defconfig | 231 ++++++++++
+ 2 files changed, 267 insertions(+)
 
 diff --git a/arch/arm/dts/rk3588s-nanopi-r6c.dts b/arch/arm/dts/rk3588s-nanopi-r6c.dts
 new file mode 100644
-index 0000000000..b7bca848ac
+index 00000000000..5e6d2c9a3ac
 --- /dev/null
 +++ b/arch/arm/dts/rk3588s-nanopi-r6c.dts
-@@ -0,0 +1,200 @@
+@@ -0,0 +1,36 @@
 +/dts-v1/;
 +#include "rk3588.dtsi"
 +#include "rk3588-u-boot.dtsi"
-+#include <dt-bindings/input/input.h>
 +
 +/ {
 +	model = "RK3588S NanoPi R6C";
-+	compatible = "rockchip,rk3588s-nanopi-r6c", "rockchip,rk3588s";
++	compatible = "rockchip,rk3588s-nanopi-r6c", "rockchip,rk3588";
 +
 +	chosen: chosen {
 +		stdout-path = &uart2;
@@ -39,169 +38,11 @@ index 0000000000..b7bca848ac
 +		u-boot,dm-pre-reloc;
 +		compatible = "regulator-fixed";
 +		regulator-name = "vcc5v0_sys";
-+		regulator-always-on;
-+		regulator-boot-on;
 +		regulator-min-microvolt = <5000000>;
 +		regulator-max-microvolt = <5000000>;
-+	};
-+
-+	vcc5v0_usb: vcc5v0-usb {
-+		u-boot,dm-pre-reloc;
-+		compatible = "regulator-fixed";
-+		regulator-name = "vcc5v0_usb";
-+		regulator-always-on;
-+		regulator-boot-on;
-+		regulator-min-microvolt = <5000000>;
-+		regulator-max-microvolt = <5000000>;
-+		vin-supply = <&vcc5v0_sys>;
-+	};
-+
-+	vcc_1v1_nldo_s3: vcc-1v1-nldo-s3 {
-+		u-boot,dm-pre-reloc;
-+		compatible = "regulator-fixed";
-+		regulator-name = "vcc_1v1_nldo_s3";
-+		regulator-always-on;
-+		regulator-boot-on;
-+		regulator-min-microvolt = <1100000>;
-+		regulator-max-microvolt = <1100000>;
-+		vin-supply = <&vcc5v0_sys>;
-+	};
-+
-+	vcc_3v3_sd_s0: vcc-3v3-sd-s0 {
-+		u-boot,dm-pre-reloc;
-+		compatible = "regulator-fixed";
-+		regulator-name = "vcc_3v3_sd_s0";
-+		enable-active-high;
-+		gpio = <&gpio4 RK_PB4 GPIO_ACTIVE_HIGH>;
-+		regulator-max-microvolt = <3000000>;
-+		regulator-min-microvolt = <3000000>;
 +		regulator-always-on;
 +		regulator-boot-on;
 +	};
-+
-+	vcc_3v3_pcie20: vcc3v3-pcie20 {
-+		u-boot,dm-pre-reloc;
-+		compatible = "regulator-fixed";
-+		regulator-name = "vcc_3v3_pcie20";
-+		regulator-min-microvolt = <3300000>;
-+		regulator-max-microvolt = <3300000>;
-+		regulator-always-on;
-+		regulator-boot-on;
-+	};
-+};
-+
-+&i2c0 {
-+	u-boot,dm-pre-reloc;
-+	status = "okay";
-+
-+	vdd_cpu_big0_s0: vdd_cpu_big0_mem_s0: rk8602@42 {
-+		u-boot,dm-pre-reloc;
-+		compatible = "rockchip,rk8602";
-+		reg = <0x42>;
-+		vin-supply = <&vcc5v0_sys>;
-+		regulator-compatible = "rk860x-reg";
-+		regulator-name = "vdd_cpu_big0_s0";
-+		regulator-min-microvolt = <550000>;
-+		regulator-max-microvolt = <1050000>;
-+		regulator-ramp-delay = <2300>;
-+		rockchip,suspend-voltage-selector = <1>;
-+		regulator-boot-on;
-+		regulator-always-on;
-+		
-+		regulator-state-mem {
-+			u-boot,dm-pre-reloc;
-+			regulator-off-in-suspend;
-+		};
-+	};
-+
-+	vdd_cpu_big1_s0: vdd_cpu_big1_mem_s0: rk8603@43 {
-+		u-boot,dm-pre-reloc;
-+		compatible = "rockchip,rk8603";
-+		reg = <0x43>;
-+		vin-supply = <&vcc5v0_sys>;
-+		regulator-compatible = "rk860x-reg";
-+		regulator-name = "vdd_cpu_big1_s0";
-+		regulator-min-microvolt = <550000>;
-+		regulator-max-microvolt = <1050000>;
-+		regulator-ramp-delay = <2300>;
-+		rockchip,suspend-voltage-selector = <1>;
-+		regulator-boot-on;
-+		regulator-always-on;
-+
-+		regulator-state-mem {
-+			u-boot,dm-pre-reloc;
-+			regulator-off-in-suspend;
-+		};
-+	};
-+};
-+
-+&i2c2 {
-+	u-boot,dm-pre-reloc;
-+	status = "okay";
-+
-+	vdd_npu_s0: vdd_npu_mem_s0: rk8602@42 {
-+		u-boot,dm-pre-reloc;
-+		compatible = "rockchip,rk8602";
-+		reg = <0x42>;
-+		vin-supply = <&vcc5v0_sys>;
-+		regulator-compatible = "rk860x-reg";
-+		regulator-name = "vdd_npu_s0";
-+		regulator-min-microvolt = <550000>;
-+		regulator-max-microvolt = <950000>;
-+		regulator-ramp-delay = <2300>;
-+		rockchip,suspend-voltage-selector = <1>;
-+		regulator-boot-on;
-+		regulator-always-on;
-+
-+		regulator-state-mem {
-+			u-boot,dm-pre-reloc;
-+			regulator-off-in-suspend;
-+		};
-+	};
-+};
-+
-+&sdhci {
-+	u-boot,dm-pre-reloc;
-+	bus-width = <8>;
-+	no-sdio;
-+	no-sd;
-+	non-removable;
-+	max-frequency = <200000000>;
-+	mmc-hs400-1_8v;
-+	mmc-hs400-enhanced-strobe;
-+	full-pwr-cycle-in-suspend;
-+	status = "okay";
-+};
-+
-+&sdmmc {
-+	u-boot,dm-pre-reloc;
-+	max-frequency = <150000000>;
-+	no-sdio;
-+	no-mmc;
-+	bus-width = <4>;
-+	cap-mmc-highspeed;
-+	cap-sd-highspeed;
-+	disable-wp;
-+	sd-uhs-sdr104;
-+	vmmc-supply = <&vcc_3v3_sd_s0>;
-+	pinctrl-names = "default";
-+	pinctrl-0 = <&sdmmc_bus4 &sdmmc_clk &sdmmc_cmd &sdmmc_det>;
-+	status = "okay";
-+};
-+
-+&pcie2x1l1 {
-+	u-boot,dm-pre-reloc;
-+	reset-gpios = <&gpio1 RK_PA7 GPIO_ACTIVE_HIGH>;
-+	rockchip,init-delay-ms = <100>;
-+	vpcie3v3-supply = <&vcc_3v3_pcie20>;
-+	status = "okay";
-+};
-+
-+&pcie2x1l2 {
-+	u-boot,dm-pre-reloc;
-+	reset-gpios = <&gpio3 RK_PD1 GPIO_ACTIVE_HIGH>;
-+	vpcie3v3-supply = <&vcc_3v3_pcie20>;
-+	status = "okay";
 +};
 +
 +&crypto {
@@ -211,17 +52,12 @@ index 0000000000..b7bca848ac
 +&uart2 {
 +	status = "okay";
 +};
-+
-+&uart5 {
-+	status = "okay";
-+};
-+
 diff --git a/configs/nanopi-r6c-rk3588s_defconfig b/configs/nanopi-r6c-rk3588s_defconfig
 new file mode 100644
-index 0000000000..d860e293c8
+index 00000000000..80fabceaebc
 --- /dev/null
 +++ b/configs/nanopi-r6c-rk3588s_defconfig
-@@ -0,0 +1,256 @@
+@@ -0,0 +1,231 @@
 +CONFIG_ARM=y
 +CONFIG_ARCH_ROCKCHIP=y
 +CONFIG_SPL_GPIO_SUPPORT=y
@@ -231,8 +67,8 @@ index 0000000000..d860e293c8
 +CONFIG_SPL_FIT_GENERATOR="arch/arm/mach-rockchip/make_fit_atf.sh"
 +CONFIG_ROCKCHIP_RK3588=y
 +CONFIG_ROCKCHIP_FIT_IMAGE=y
-+CONFIG_ROCKCHIP_HWID_DTB=y
 +CONFIG_ROCKCHIP_VENDOR_PARTITION=y
++CONFIG_USING_KERNEL_DTB_V2=y
 +CONFIG_ROCKCHIP_FIT_IMAGE_PACK=y
 +CONFIG_ROCKCHIP_NEW_IDB=y
 +CONFIG_LOADER_INI="RK3588MINIALL.ini"
@@ -253,12 +89,13 @@ index 0000000000..d860e293c8
 +CONFIG_SPL_FIT_IMAGE_POST_PROCESS=y
 +CONFIG_SPL_FIT_HW_CRYPTO=y
 +# CONFIG_SPL_SYS_DCACHE_OFF is not set
-+CONFIG_BOOTDELAY=0
++CONFIG_BOOTDELAY=1
 +CONFIG_SYS_CONSOLE_INFO_QUIET=y
 +# CONFIG_DISPLAY_CPUINFO is not set
 +CONFIG_ANDROID_BOOTLOADER=y
 +CONFIG_ANDROID_AVB=y
 +CONFIG_ANDROID_BOOT_IMAGE_HASH=y
++CONFIG_BOARD_RNG_SEED=y
 +CONFIG_SPL_BOARD_INIT=y
 +# CONFIG_SPL_RAW_IMAGE_SUPPORT is not set
 +# CONFIG_SPL_LEGACY_IMAGE_SUPPORT is not set
@@ -268,6 +105,7 @@ index 0000000000..d860e293c8
 +CONFIG_SPL_MMC_WRITE=y
 +CONFIG_SPL_MTD_SUPPORT=y
 +CONFIG_SPL_ATF=y
++CONFIG_SPL_AB=y
 +CONFIG_FASTBOOT_BUF_ADDR=0xc00800
 +CONFIG_FASTBOOT_BUF_SIZE=0x07000000
 +CONFIG_FASTBOOT_FLASH=y
@@ -286,8 +124,8 @@ index 0000000000..d860e293c8
 +# CONFIG_CMD_LOADB is not set
 +# CONFIG_CMD_LOADS is not set
 +CONFIG_CMD_BOOT_ANDROID=y
++CONFIG_CMD_BOOT_ROCKCHIP=y
 +CONFIG_CMD_MMC=y
-+CONFIG_CMD_PCI=y
 +CONFIG_CMD_SF=y
 +CONFIG_CMD_SPI=y
 +CONFIG_CMD_USB=y
@@ -366,11 +204,6 @@ index 0000000000..d860e293c8
 +CONFIG_DM_ETH_PHY=y
 +CONFIG_DWC_ETH_QOS=y
 +CONFIG_GMAC_ROCKCHIP=y
-+CONFIG_NVME=y
-+CONFIG_PCI=y
-+CONFIG_DM_PCI=y
-+CONFIG_DM_PCI_COMPAT=y
-+CONFIG_PCIE_DW_ROCKCHIP=y
 +CONFIG_PHY_ROCKCHIP_INNO_USB2=y
 +CONFIG_PHY_ROCKCHIP_SAMSUNG_HDPTX=y
 +CONFIG_PHY_ROCKCHIP_USBDP=y
@@ -378,7 +211,6 @@ index 0000000000..d860e293c8
 +CONFIG_SPL_PINCTRL=y
 +CONFIG_DM_FUEL_GAUGE=y
 +CONFIG_POWER_FG_CW201X=y
-+CONFIG_POWER_FG_CW221X=y
 +CONFIG_DM_PMIC=y
 +CONFIG_PMIC_SPI_RK8XX=y
 +CONFIG_DM_POWER_DELIVERY=y
@@ -390,11 +222,9 @@ index 0000000000..d860e293c8
 +CONFIG_DM_REGULATOR_FIXED=y
 +CONFIG_DM_REGULATOR_GPIO=y
 +CONFIG_REGULATOR_RK860X=y
-+CONFIG_REGULATOR_RK806=y
++CONFIG_REGULATOR_RK8XX=y
 +CONFIG_CHARGER_BQ25700=y
 +CONFIG_CHARGER_BQ25890=y
-+CONFIG_CHARGER_SC8551=y
-+CONFIG_CHARGER_SGM41542=y
 +CONFIG_DM_CHARGE_DISPLAY=y
 +CONFIG_CHARGE_ANIMATION=y
 +CONFIG_PWM_ROCKCHIP=y
@@ -416,7 +246,6 @@ index 0000000000..d860e293c8
 +CONFIG_USB=y
 +CONFIG_USB_XHCI_HCD=y
 +CONFIG_USB_XHCI_DWC3=y
-+CONFIG_USB_XHCI_PCI=y
 +CONFIG_USB_EHCI_HCD=y
 +CONFIG_USB_EHCI_GENERIC=y
 +CONFIG_USB_OHCI_HCD=y
@@ -433,15 +262,10 @@ index 0000000000..d860e293c8
 +CONFIG_DM_VIDEO=y
 +CONFIG_DISPLAY=y
 +CONFIG_DRM_ROCKCHIP=y
-+CONFIG_DRM_MAXIM_MAX96745=y
-+CONFIG_DRM_MAXIM_MAX96752F=y
-+CONFIG_DRM_MAXIM_MAX96755F=y
-+CONFIG_DRM_PANEL_MAXIM_DESERIALIZER=y
-+CONFIG_DRM_ROHM_BU18XL82=y
 +CONFIG_DRM_ROCKCHIP_DW_HDMI_QP=y
 +CONFIG_DRM_ROCKCHIP_DW_MIPI_DSI2=y
-+CONFIG_DRM_ROCKCHIP_ANALOGIX_DP=y
 +CONFIG_DRM_ROCKCHIP_DW_DP=y
++CONFIG_DRM_ROCKCHIP_ANALOGIX_DP=y
 +CONFIG_DRM_ROCKCHIP_SAMSUNG_MIPI_DCPHY=y
 +CONFIG_PHY_ROCKCHIP_SAMSUNG_HDPTX_HDMI=y
 +CONFIG_USE_TINY_PRINTF=y
@@ -465,19 +289,6 @@ index 0000000000..d860e293c8
 +CONFIG_OPTEE_CLIENT=y
 +CONFIG_OPTEE_V2=y
 +CONFIG_OPTEE_ALWAYS_USE_SECURITY_PARTITION=y
-+CONFIG_PHY_ROCKCHIP_NANENG_COMBOPHY=y
-+CONFIG_CMD_SETEXPR=y
-+CONFIG_PHY_ROCKCHIP_SNPS_PCIE3=y
-+CONFIG_SYS_PROMPT="opi# "
-+CONFIG_AHCI=y
-+CONFIG_CMD_SCSI=y
-+CONFIG_DM_SCSI=y
-+CONFIG_DWC_AHCI=y
-+CONFIG_LIBATA=y
-+CONFIG_SCSI_AHCI=y
-+CONFIG_SCSI=y
-+CONFIG_USING_KERNEL_DTB_V2=y
-+CONFIG_MTD_BLK_U_BOOT_OFFS=0x400
 \ No newline at end of file
 -- 
 Created with Armbian build tools https://github.com/armbian/build
