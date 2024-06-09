@@ -1,21 +1,21 @@
 From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
 From: John Doe <john.doe@somewhere.on.planet>
-Date: Sat, 1 Jun 2024 17:05:48 +0800
+Date: Sat, 8 Jun 2024 20:22:43 +0800
 Subject: Patching u-boot rk35xx files arch/arm/dts/rk3588s-nanopi-r6c.dts
  configs/nanopi-r6c-rk3588s_defconfig
 
 Signed-off-by: John Doe <john.doe@somewhere.on.planet>
 ---
- arch/arm/dts/rk3588s-nanopi-r6c.dts  |  36 ++
- configs/nanopi-r6c-rk3588s_defconfig | 231 ++++++++++
- 2 files changed, 267 insertions(+)
+ arch/arm/dts/rk3588s-nanopi-r6c.dts  |  12 +
+ configs/nanopi-r6c-rk3588s_defconfig | 229 ++++++++++
+ 2 files changed, 241 insertions(+)
 
 diff --git a/arch/arm/dts/rk3588s-nanopi-r6c.dts b/arch/arm/dts/rk3588s-nanopi-r6c.dts
 new file mode 100644
-index 00000000000..5e6d2c9a3ac
+index 0000000000..0b2bcfd923
 --- /dev/null
 +++ b/arch/arm/dts/rk3588s-nanopi-r6c.dts
-@@ -0,0 +1,36 @@
+@@ -0,0 +1,12 @@
 +/dts-v1/;
 +#include "rk3588.dtsi"
 +#include "rk3588-u-boot.dtsi"
@@ -25,39 +25,15 @@ index 00000000000..5e6d2c9a3ac
 +	compatible = "rockchip,rk3588s-nanopi-r6c", "rockchip,rk3588";
 +
 +	chosen: chosen {
-+		stdout-path = &uart2;
 +		u-boot,spl-boot-order = &sdmmc, &sdhci;
 +	};
-+
-+	aliases: aliases {
-+		mmc0 = &sdhci;
-+		mmc1 = &sdmmc;
-+	};
-+
-+	vcc5v0_sys: vcc5v0-sys {
-+		u-boot,dm-pre-reloc;
-+		compatible = "regulator-fixed";
-+		regulator-name = "vcc5v0_sys";
-+		regulator-min-microvolt = <5000000>;
-+		regulator-max-microvolt = <5000000>;
-+		regulator-always-on;
-+		regulator-boot-on;
-+	};
-+};
-+
-+&crypto {
-+	status = "okay";
-+};
-+
-+&uart2 {
-+	status = "okay";
 +};
 diff --git a/configs/nanopi-r6c-rk3588s_defconfig b/configs/nanopi-r6c-rk3588s_defconfig
 new file mode 100644
-index 00000000000..80fabceaebc
+index 0000000000..f27f4bd61c
 --- /dev/null
 +++ b/configs/nanopi-r6c-rk3588s_defconfig
-@@ -0,0 +1,231 @@
+@@ -0,0 +1,229 @@
 +CONFIG_ARM=y
 +CONFIG_ARCH_ROCKCHIP=y
 +CONFIG_SPL_GPIO_SUPPORT=y
@@ -95,7 +71,6 @@ index 00000000000..80fabceaebc
 +CONFIG_ANDROID_BOOTLOADER=y
 +CONFIG_ANDROID_AVB=y
 +CONFIG_ANDROID_BOOT_IMAGE_HASH=y
-+CONFIG_BOARD_RNG_SEED=y
 +CONFIG_SPL_BOARD_INIT=y
 +# CONFIG_SPL_RAW_IMAGE_SUPPORT is not set
 +# CONFIG_SPL_LEGACY_IMAGE_SUPPORT is not set
@@ -105,7 +80,6 @@ index 00000000000..80fabceaebc
 +CONFIG_SPL_MMC_WRITE=y
 +CONFIG_SPL_MTD_SUPPORT=y
 +CONFIG_SPL_ATF=y
-+CONFIG_SPL_AB=y
 +CONFIG_FASTBOOT_BUF_ADDR=0xc00800
 +CONFIG_FASTBOOT_BUF_SIZE=0x07000000
 +CONFIG_FASTBOOT_FLASH=y
@@ -222,7 +196,7 @@ index 00000000000..80fabceaebc
 +CONFIG_DM_REGULATOR_FIXED=y
 +CONFIG_DM_REGULATOR_GPIO=y
 +CONFIG_REGULATOR_RK860X=y
-+CONFIG_REGULATOR_RK8XX=y
++CONFIG_REGULATOR_RK806=y
 +CONFIG_CHARGER_BQ25700=y
 +CONFIG_CHARGER_BQ25890=y
 +CONFIG_DM_CHARGE_DISPLAY=y

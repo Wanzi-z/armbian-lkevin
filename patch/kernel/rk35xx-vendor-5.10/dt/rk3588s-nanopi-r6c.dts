@@ -123,41 +123,82 @@
 		
 		led_sys: led-sys {
 			gpios = <&gpio1 RK_PC1 GPIO_ACTIVE_HIGH>;
-            linux,default-trigger = "heartbeat";
-			default-state = "on";
+			linux,default-trigger = "heartbeat";
 			label = "red:sys";
 		};
 
 		led_wan: led-wan {
 			gpios = <&gpio1 RK_PC2 GPIO_ACTIVE_HIGH>;
-			linux,default-trigger = "activity";
-			default-state = "on";
 			label = "green:wan";
 		};
 
 		led_lan: led-lan {
 			gpios = <&gpio1 RK_PC3 GPIO_ACTIVE_HIGH>;
-			linux,default-trigger = "activity";
-			default-state = "on";
 			label = "green:lan";
 		};
 
 		user_led: user-led {
 			gpios = <&gpio1 RK_PC4 GPIO_ACTIVE_HIGH>;
-			linux,default-trigger = "activity";
-			default-state = "on";
 			label = "green:user";
 		};
-	};	
-
-	hdmi0_sound: hdmi0-sound {
-		compatible = "rockchip,hdmi";
-		rockchip,mclk-fs = <128>;
-		rockchip,card-name = "rockchip-hdmi0";
-		status = "okay";
 	};
 
-	test-power {
+	hdmi0_sound: hdmi0-sound {
+		status = "okay";
+		compatible = "rockchip,hdmi";
+		rockchip,mclk-fs = <128>;
+		rockchip,card-name = "rockchip,hdmi0";
+		rockchip,cpu = <&i2s5_8ch>;
+		rockchip,codec = <&hdmi0>;
+	};
+
+	cspmu: cspmu@fd10c000 {
+		compatible = "rockchip,cspmu";
+		reg = <0x0 0xfd10c000 0x0 0x1000>,
+		      <0x0 0xfd10d000 0x0 0x1000>,
+		      <0x0 0xfd10e000 0x0 0x1000>,
+		      <0x0 0xfd10f000 0x0 0x1000>,
+		      <0x0 0xfd12c000 0x0 0x1000>,
+		      <0x0 0xfd12d000 0x0 0x1000>,
+		      <0x0 0xfd12e000 0x0 0x1000>,
+		      <0x0 0xfd12f000 0x0 0x1000>;
+	};
+
+	reserved_memory: reserved-memory {
+		#address-cells = <2>;
+		#size-cells = <2>;
+		ranges;
+
+		cma: cma {
+			compatible = "shared-dma-pool";
+			reusable;
+			size = <0x0 (8 * 0x100000)>;
+			linux,cma-default;
+		};
+
+		drm_logo: drm-logo@00000000 {
+			compatible = "rockchip,drm-logo";
+			reg = <0x0 0x0 0x0 0x0>;
+		};
+
+		drm_cubic_lut: drm-cubic-lut@00000000 {
+			compatible = "rockchip,drm-cubic-lut";
+			reg = <0x0 0x0 0x0 0x0>;
+		};
+
+		ramoops: ramoops@110000 {
+			compatible = "ramoops";
+			reg = <0x0 0x110000 0x0 0xe0000>;
+			boot-log-size = <0x8000>;
+			boot-log-count = <0x1>;
+			console-size = <0x80000>;
+			pmsg-size = <0x30000>;
+			ftrace-size = <0x00000>;
+			record-size = <0x14000>;
+		};
+	};
+
+	test_power: test-power {
 		status = "okay";
 	};
 };
@@ -225,8 +266,8 @@
 };
 
 &hdmi0 {
+	cec-enable;
 	enable-gpios = <&gpio4 RK_PB6 GPIO_ACTIVE_HIGH>;
-	cec-enable = "true";
 	status = "okay";
 };
 
@@ -244,8 +285,8 @@
 };
 
 &display_subsystem {
-	clocks = <&hdptxphy_hdmi_clk0>;
-	clock-names = "hdmi0_phy_pll";
+	memory-region = <&drm_logo>;
+	memory-region-names = "drm-logo";
 };
 
 &i2c0 {
