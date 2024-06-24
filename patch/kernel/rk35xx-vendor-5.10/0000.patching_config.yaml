@@ -1,21 +1,11 @@
 config:
 
   # Just some info stuff; not used by the patching scripts
-<<<<<<<< HEAD:patch/kernel/rk35xx-vendor-5.10/0000.patching_config.yaml
   name: rk35xx-5.10
   kind: kernel
   type: nanopi
   branch: 5.10.160
   last-known-good-tag: v5.10.160
-========
-  name: sm8250-6.10
-  kind: kernel
-  type: mainline # or: vendor
-  branch: linux-6.10.y
-  last-known-good-tag: v6.10-rc2
-  maintainers:
-    - { github: rpardini, name: Ricardo Pardini, email: ricardo@pardini.net, armbian-forum: rpardini }
->>>>>>>> 8618c4bcd5dbff917e30668a6af7235253705889:patch/kernel/archive/sm8250-6.10/0000.patching_config.yaml
 
   # .dts files in these directories will be copied as-is to the build tree; later ones overwrite earlier ones.
   # This is meant to provide a way to "add a board DTS" without having to null-patch them in.
